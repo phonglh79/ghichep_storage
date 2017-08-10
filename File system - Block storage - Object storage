@@ -1,0 +1,49 @@
+#File system - Block storage - Object storage
+
+##1. Đinh nghĩa 
+
+###File storage: Là hệ thống cấp bậc của các file và folder được quản lý bởi hệ thống lưu trữ và có thể bao gồm các thiết bị cứng ngoài, hệ thống mạng đính kèm và hệ thống dự phòng online.
+
+Chúng ta biết rằng file thường hướng cấu trúc hệ thống và được phân cấp, 1 tập tin cá nhân thì có 1 đường dẫn mô tả đến tập tin đó. Mỗi file đều có những thuốc tính riêng: như người tạo, người có thể truy cập, kích thước được lưu trữ thành metadata trong hệ thống.
+
+Chúng ta cũng biết tới NAS (network-attached storage) như cách tốt nhất để chia sẻ file 1 cách an toàn giữa người dùng trong cùng 1 mạng nó sử dụng tốt vs LAN nhưng không tốt với WAN. Quản lý 1 vài NAS là bình thường nhưng lên tới hàng trăm thì thật sự là ác mộng.
+
+File system chịu trách nhiệm với việc sắp xếp dữ liệu trong NAS box cũng như thực hiện chia sẻ tập tin khi khóa hoặc mở khóa khi cần thiêt.
+
+###Block Storage: Là lưu trữ liên tục dưới dạng khối (1 block), mỗi khối này có kích thước bằng nhau. 1 ổ đĩa thông thường, mảng RAID hoặc lưu trữ USB là ví dụ của kiểu block storage.
+
+Với block storage, file được cắt nhỏ với kích thước bằng kích thướng độ lớn của 1 block. Mỗi file này sẽ có 1 địa chỉ riêng, và ứng dụng lấy block bằng các lời gọi SCSI tới địa chỉ. Không như trường hợp của NAS, ứng dụng quyết định đâu là nơi lưu trữ dữ liệu và cách giao tiếp với khối lưu trữ.
+
+Block storage có thể là khối lưu trữ cục bộ hoặc đính kèm với mạng như trong SAN, như giao thức iSCSl. Thiết bị Block storage thường được định dạng với file hệ thống, như Linux ext3 và btrfs hoặc Microsoft FAT32 hoặc NTFS.
+
+Trong OpenStack, block storage được cung cấp bởi hệ thống Nova kết hơn làm việc với hện thống Cinder. Khi bạn bật máy ảo ở Nova, nó sẽ kết nối đến block storage mặc định ít nhất là đến phần đọc/ghi mà hệ điều hành đang chạy.
+
+Block storage có thể được sử dụng với dữ liệu bị mất khi máy ảo dừng hoặc cả với dữ liệu mà sẽ tồn tại được sử dụng lại khi máy ảo khởi động lại, tùy thuộc vào cấu hình trong OpenStack.
+
+Thiết bị Block storage thường được đính kèm và sử dụng đọc. ghi chỉ với 1 máy hoặc 1 máy ảo trong 1 thời gian (nghĩa là chỉ có 1 máy thao tác với dữ liệu 1 ở 1 thời điểm).
+
+Block storage có thể được hiểu là đối tượng được lưu trữ trong các khối.
+
+###Object Storage: Là lưu trữ storage hướng đến đối tượng. Đây là 1 cách hữu dụng đối với HTML và đảm bảo an toàn cho dữ liệu cao hơn. Đối tượng ở đây là các dòng bytes. 1 lần đối tượng được tạo và ghi, nó không thể thay đổi mà chỉ có thể copy hoặc xóa. Vì nó không cung cấp cho việc bạn sửa 1 lần của dữ liệu, nó coi mỗi đối tượng được lưu trữ là 1 đơn vị. Đối tượng lưu trữ trả về ID khối thường được tính từ nội dung của đối tượng (bao gồm cả file và metadata của nó).Không giống như file, đối tượng ở đây được lưu trữ theo cấu trúc phẳng
+
+1 lần ghi các đối tượng có thể được đọc với nhiều máy khách. Nếu bạn muốn dữ liệu được ghi 1 lần và có thể được đọc bởi nhiều máy tính gần, xa trong tương lai, object storage có thể giúp bạn thực hiện điều đó. Object storage thì được hiểu là đối tượng được lưu trữ. Đối tượng ở đây chứa cấc dữ liêu, metadata và được định danh 1 cách duy nhất. Không giới hạn về kiểu và dung lượng metadata, nó khiến cho object storage trở nên dễ tùy chỉnh và tốt hơn.
+
+##2. So sánh
+
+
+
+Điểm khác biệc nữa với block storage, là block storage được truy cập trực tiếp bởi hệ điều hành trong khi Object storage sẽ bị ảnh hưởng lớn tới hiệu năng khi làm điều đó.
+
+Object storage là ý tưởng để giải quyết vấn đề về việc dữ liệu tăng. Dữ liệu ngày càng được tạo ra nhiều, hệ thống lưu trữ cũng cùng phát triển với tốc độ tương ứng. Điều j sẽ xảy ra nếu bạn cố gắng phát triển hệ thống lưu trữ khối lên vượt quá cả trăm tetabytes hoặc xa hơn là petabyte? Bạn có thể gặp vấn đề về độ bền, hạn chế khó khăn với cơ sở hạ tầng mà bạn đang có hoặc chi phí quản lý của bạn có thể lên tận nóc.
+
+Giải quyết vấn đề về quản lý dự phòng do việc mở rộng dung lượng lưu trữ ở quy mô này là điểm mạnh của Object storage. Đối với các Web tĩnh, dữ liệu dự phòng, hay các văn bản lưu trữ là trường hợp sử dụng tuyệt vời của object storage.
+
+Kiến trúc lưu trữ dựa trên đối tượng có thể được thu nhỏ và quản lý chỉ đơn giản bằng cách thêm vào các nodes. Tổ chức thành các không gian tên của dữ liệu, kết hợp với các chức năng mở rộng siêu dữ liệu (metadata) khiến cho việc này được dễ dàng sử dụng. 1 ưu điểm khác là nó đảm bảo được sự phục hồi dữ liệu và giảm thiểu chi phí thấp. Đối tượng dữ liệu được bảo về bằng cách lưu trữ thành nhiều bản sao của dữ liệu trên hệ thống phân phối rộng. Nếu 1 hoặc nhiều node lưu trữ bị gặp sự cố, dữ liệu vẫn có thể được sử dụng. Hầu hết các trường hợp người dùng cuối đều không bị ảnh hưởng về downtime. Hầu hết các trường hợp thì có ít nhất 3 bản sao được lưu trữ.
+
+Object storage tiết kiệm tiền với giá thành hệ thống với phần cứng rẻ hơn, giảm thời gian quản lý thông qua việc dễ dàng mở rông, cung cấp linh hoạt cho 1 số loại lưu trữ. Tuy nhiên thì nó không phải là câu trả lời cho mọi vấn đề về lưu trữ. Đôi khi sử dụng block storage là hợp lý hơn, object storage sẽ không đáp ứng được trong 1 vài trường hợp. Object cung cấp khả năng mở rộng không giới hạn đảm bảo tính sẵn sàng cao tuy nhiên là đối với các kiểu dữ liệu lâu bền, không đòi hỏi nhiều sự thay đổi về nội dung, và nhược điểm là nó sẽ không đảm bảo việc trả về các phiên bản mới nhất của dữ liệu
+
+Khối lượng công việc object vs block: Object làm việc rất tốt với các kiểu dữ liệu không cấu trúc, nơi mà các dữ liệu chỉ được đọc chứ không được ghi, web tĩnh, dữ liệu backup, lưu trữ ảnh, video, music... Tất cả được lưu trữ 1 cách tốt nhất với object storage. Cơ sở dữ liệu trong môi trường object storage lý tưởng có bộ dữ liệu không được tổ chức cấu trúc, nơi mà các dữ liệu sẽ không đòi hỏi 1 số lượng lớn các bài viết chỉnh sửa cập nhật. Phân phối các back-end storage với địa lý khác nhau cũng là 1 trường hợp sửu dụng tuyệt vời của việc lưu trữ object. Các ứng dụng lưu trữ object hiện nay như lưu trữ mạng và hỗ trợ metadata mở rộng cho phân phối hiệu quả và truy cập song song tới đối tượng, Nó khiến cho việc di chuyển các cụm backend storage quan các trung tâm dữ liệu khác nhau được thực hiện. Tuy nhiên đối với các dữ liệu được giao dịch thì không nên sử dụng vì nó có thể ảnh hưởng đến bản cập nhật dữ liệu cuối cùng.
+
+Các thiết bị lưu trữ block được truy cập như 1 volumes và trực tiếp đối với hệ điều hành (không qua metadata) nên nó có thể thực hiện việc lưu trữ tốt hơn trong 1 số trường hợp, ví dụ là đối với các dữ liệu có cấu trúc, có thể đọc ghi dữ liệu, tuy nhiên do việc không sử dụng metadata nên sẽ giảm hiệu suất đáng kể đối với hệ thống phân tán về mặt vật lý.
+
+Lưu trữ theo block được coi là phát triển hơn, nhưng filesystem thì dễ quản lý và thực thi. Nó cũng ít đắt hơn so với block-storage được sử dụng ở các máy nhà hoặc công ty nhỏ, còn block storage được sử dụng ở doanh nghiệp lớn hơn. Mỗi block thì được kiểm soát bởi 1 drive cứng của nó và quản lý máy chủ dựa vào hệ điều hành riêng.
