@@ -28,9 +28,8 @@ Block storage có thể được hiểu là đối tượng được lưu trữ 
 
 1 lần ghi các đối tượng có thể được đọc với nhiều máy khách. Nếu bạn muốn dữ liệu được ghi 1 lần và có thể được đọc bởi nhiều máy tính gần, xa trong tương lai, object storage có thể giúp bạn thực hiện điều đó. Object storage thì được hiểu là đối tượng được lưu trữ. Đối tượng ở đây chứa cấc dữ liêu, metadata và được định danh 1 cách duy nhất. Không giới hạn về kiểu và dung lượng metadata, nó khiến cho object storage trở nên dễ tùy chỉnh và tốt hơn.
 
+
 ##2. So sánh
-
-
 
 Điểm khác biệc nữa với block storage, là block storage được truy cập trực tiếp bởi hệ điều hành trong khi Object storage sẽ bị ảnh hưởng lớn tới hiệu năng khi làm điều đó.
 
